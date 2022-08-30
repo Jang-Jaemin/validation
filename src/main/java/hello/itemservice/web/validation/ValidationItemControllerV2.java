@@ -1,3 +1,10 @@
+//  타임 리프 스프링 검증 오류 통합 기능
+//  타임리프는 스프링의 BindingResult를 활용해서 편리하게 검증 오류를 표현하는 기능을 제공한다.
+//  #fields: #fields로BindingResult가 제공하는 검증오류에 접근할 수 있다.
+//  th:errors: 해당 필드에 오류가 있는 경우에 태그를 출력한다.
+//  th:if의편의 버전이다.
+//  th:errorclass: th:field에서지정한필드에오류가있으면class 정보를 추가한다.
+
 package hello.itemservice.web.validation;
 
 import hello.itemservice.domain.item.Item;
@@ -51,9 +58,14 @@ public class ValidationItemControllerV2 {
         return "validation/v2/addForm";
     }
 
+//    BindingResult bindingResult 파라미터의위치는 @ModelAttribute Item item 다음에 와야한다.
 //    @PostMapping("/add")
     public String addItemV1(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
 
+        //FieldError 생성자요약
+        //필드에 오류가 있으면 FieldError 객체를 생성해서 bindingResult에 담아두면 된다.
+        //objectName: @ModelAttribute 이름
+        //field: 오류가 발생한 필드 이름 defaultMessage: 오류 기본 메시지
         //검증 로직
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수 입니다."));
@@ -66,6 +78,8 @@ public class ValidationItemControllerV2 {
         }
 
         //특정 필드가 아닌 복합 룰 검증
+        //objectName: @ModelAttribute의 이름
+        //defaultMessage: 오류 기본 메시지
         if (item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
             if (resultPrice < 10000) {
